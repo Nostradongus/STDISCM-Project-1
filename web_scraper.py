@@ -51,5 +51,8 @@ while flag:
         if len(links) > 162:
             break
 
+# display the collected urls (webpages)
 for url in links:   
     print(url)
+    
+# TODO: implement functionality to find and get possible emails from each webpage, with parallelism applied
