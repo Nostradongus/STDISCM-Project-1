@@ -15,7 +15,8 @@ from bs4 import BeautifulSoup
 import re
 import time
 
-source_code = requests.get('https://www.dlsu.edu.ph/')
+URL = 'https://www.dlsu.edu.ph/'
+source_code = requests.get(URL)
 soup = BeautifulSoup(source_code.content, 'lxml')
 data = []
 links = []
