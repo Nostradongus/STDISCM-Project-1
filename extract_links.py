@@ -103,6 +103,7 @@ if __name__ == "__main__":
     # display the urls
     print(all_urls)
     
+    # save all collected links to a text file
     with open('dlsu_links.txt', 'w') as f:
         for url in all_urls:
             f.write(f"{url}\n")
