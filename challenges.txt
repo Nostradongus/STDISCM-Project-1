@@ -1,0 +1,6 @@
+Challenges encountered so far from the project:
+1) Extracting all possible urls from the DLSU website (all webpages)
+- There are urls that lead to pdfs, pngs, etc. (e.g. /<file_name>.pdf) which should not be included
+    - An algorithm should be implemented to avoid including these urls in the list
+- Extracting urls takes a lot of time, and sometimes there are urls that are revisited more than once which should be avoided
+    - An algorithm should be implemented to avoid revisiting already visited urls
