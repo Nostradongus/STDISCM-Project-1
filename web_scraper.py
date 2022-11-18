@@ -22,7 +22,7 @@ links = []
 
 def remove_duplicates(l): # remove duplicates and unURL string
     for item in l:
-        match = re.search("(?P<url>https?://[^\s]+)", item)
+        match = re.search("(?P<url>https?://(?:www\.dlsu\.)[^\s]+)", item)
         if match is not None:
             links.append((match.group("url")))
 
@@ -40,15 +40,15 @@ while flag:
                 temp.append(str(j.get('href')))
                 remove_duplicates(temp)
 
-                if len(links) > 162: # set limitation to number of URLs
+                if len(links) > 500: # set limitation to number of URLs
                     break
-            if len(links) > 162:
+            if len(links) > 500:
                 break
-        if len(links) > 162:
+        if len(links) > 500:
             break
     except Exception as e:
         print(e)
-        if len(links) > 162:
+        if len(links) > 500:
             break
 
 # display the collected urls (webpages)
