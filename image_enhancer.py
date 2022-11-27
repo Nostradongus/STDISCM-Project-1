@@ -7,7 +7,7 @@ Group 2
 - Andre Dominic Ponce
 - Joshue Salvador Jadie 
 
-Last Updated: 11/27/22
+Last Updated: 11/28/22
 """
 
 # Image enhancement libraries
