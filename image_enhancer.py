@@ -65,16 +65,24 @@ def enhance_image(image_data):
     
     # Check if image is a gif 
     if image_data[2].lower() == 'gif': 
-        # Convert gif to RGBA channel format 
-        image_data[0] = image_data[0].convert('RGBA')
+        # List of enhanced frames
+        enhanced_frames = []
         
-        # Process each frame of the gif
+        # Enhance each frame of the gif
         for frame in ImageSequence.Iterator(image_data[0]):
-            # Enhance image based on enhancement factors using Pillow
-            enhanced = ImageEnhance.Brightness(frame).enhance(brightness)
+            # Convert current frame to RGBA channel format
+            enhanced = frame.convert('RGBA')
+            
+            # Enhance current frame based on enhancement factors using Pillow
+            enhanced = ImageEnhance.Brightness(enhanced).enhance(brightness)
             enhanced = ImageEnhance.Sharpness(enhanced).enhance(sharpness)
             enhanced = ImageEnhance.Contrast(enhanced).enhance(contrast)
-            frame = enhanced
+            
+            # Store enhanced current frame
+            enhanced_frames.append(enhanced)
+            
+        # Store list of enhanced frames
+        image_data[0] = enhanced_frames
     else:
         # Enhance image based on enhancement factors using Pillow
         enhanced = ImageEnhance.Brightness(image_data[0]).enhance(brightness)
@@ -113,24 +121,20 @@ def main(args):
         
     # Save the enhanced images to the output folder
     for image in enhanced_images:
+        print(f'Saving {args.output}/{image[1]}.{image[2]}')
+        
         # if current image is a gif
         if image[2].lower() == 'gif':
-            # Get all frames of gif
-            current_frame = image[0]
-            current_frame.seek(1) # move to second frame
-            frames = [frame.copy() for frame in ImageSequence.Iterator(current_frame)]
-            
-            # save gif
-            image[0].save(
+            # save gif, start from first frame
+            image[0][0].save(
                 f'{args.output}/{image[1]}.{image[2]}',
                 save_all=True,
-                append_images=frames,
+                append_images=image[0][1:], # append rest of the frames, starting from second frame
                 duration=100,
                 loop=0
             )
         else:
             # save image (jpg or png)
-            print(f'{args.output}/{image[1]}.{image[2]}')
             image[0].save(f'{args.output}/{image[1]}.{image[2]}')
     
     # TODO: Add statistics file (number of images enhanced, output folder location, etc.)
