@@ -12,6 +12,7 @@ Last Updated: 11/27/22
 
 # Image enhancement libraries
 import os        # For accessing directories (folders, etc.)
+from math import fabs # For absolute float value conversion
 import argparse  # For parsing command line arguments
 from PIL import Image, ImageSequence, ImageEnhance # For enhancing images
 
@@ -89,11 +90,11 @@ def enhance_image(image_data):
 def main(args):
     # Update system variables
     global time_limit, num_threads, brightness, sharpness, contrast
-    time_limit = args.time
-    num_threads = args.threads
-    brightness = args.brightness
-    sharpness = args.sharpness
-    contrast = args.contrast
+    time_limit = abs(args.time)
+    num_threads = abs(args.threads)
+    brightness = fabs(args.brightness)
+    sharpness = fabs(args.sharpness)
+    contrast = fabs(args.contrast)
     
     # Global enhanced images list
     global enhanced_images
@@ -155,33 +156,27 @@ if __name__ == "__main__":
                         required=False)
     parser.add_argument('-t', '--time',
                         type=int,
-                        help='Enhancing time in minutes; 1 minute by default, negative inputs will be converted to positive',
+                        help='Enhancing time in minutes; 1 minute by default, converted to absolute value',
                         default='1',
                         required=False)
     parser.add_argument('-b', '--brightness',
                         type=float,
                         help='Brightness enhancement factor',
-                        choices=[Range(0.0, 1.1)],
-                        metavar="[0.0 to 1.0]",
                         default=1.0,
                         required=False)
     parser.add_argument('-s', '--sharpness',
                         type=float,
                         help='Sharpness enhancement factor',
-                        choices=[Range(0.0, 1.1)],
-                        metavar="[0.0 to 1.0]",
                         default=1.0,
                         required=False)
     parser.add_argument('-c', '--contrast',
                         type=float,
-                        help='Contrast enhancement factor',
-                        choices=[Range(0.0, 1.1)],
-                        metavar="[0.0 to 1.0]",
+                        help='Contrast enhancement factor; converted to absolute value',
                         default=1.0,
                         required=False)
     parser.add_argument('-n', '--threads',
                         type=int,
-                        help='Number of threads to use; negative inputs will be converted to positive',
+                        help='Number of threads to use, converted to absolute value',
                         default=5,
                         required=False)
     
