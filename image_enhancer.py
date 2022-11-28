@@ -7,13 +7,19 @@ Group 2
 - Andre Dominic Ponce
 - Joshue Salvador Jadie 
 
+Tom & Jerry Images Source:
+https://www.kaggle.com/datasets/balabaskar/tom-and-jerry-image-classification
+
+GIF Source:
+https://www.kaggle.com/datasets/raingo/tumblr-gif-description-dataset
+
 Last Updated: 11/28/22
 """
 
 # Image enhancement libraries
-import os        # For accessing directories (folders, etc.)
-from math import fabs  # For absolute float value conversion
-import argparse  # For parsing command line arguments
+import os               # For accessing directories (folders, etc.)
+from math import fabs   # For absolute float value conversion
+import argparse         # For parsing command line arguments
 from PIL import Image, ImageSequence, ImageEnhance  # For enhancing images
 
 # Thread synchronization libraries
@@ -22,28 +28,27 @@ import queue      # For thread-safe queue object
 import time       # For time checking, etc.
 
 # System variables
-time_limit = 1                  # Enhancing time limit (in minutes)
-num_threads = 5                 # Number of threads that will enhance the images
-brightness = 1.0                # Brightness enhancement factor
-sharpness = 1.0                 # Sharpness enhancement factor
-contrast = 1.0                  # Contrast enhancement factor
-output = "Results"              # Output folder name
-start_time = time.perf_counter()        # Starting time of the program
-num_images_input = 0            # Number of input images
-formats = ['jpg', 'png', 'gif']  # accepted image types / formats
+time_limit = 1                    # Enhancing time limit (in minutes)
+num_threads = 5                   # Number of threads that will enhance the images
+brightness = 1.0                  # Brightness enhancement factor
+sharpness = 1.0                   # Sharpness enhancement factor
+contrast = 1.0                    # Contrast enhancement factor
+output = "Results"                # Output folder name
+formats = ['jpg', 'png', 'gif']   # accepted image types / formats
+start_time = time.perf_counter()  # Starting time of the program
+num_images_input = 0              # Number of input images
 
 # Global shared variables
 # Images queue (each element is a list [input path, image filename, image format / type (extension)])
 images = queue.Queue()
-num_images_enhanced = 0  # Number of images enhanced by the threads
+# Number of images enhanced by the threads
+num_images_enhanced = 0
 
 # Synchronization variables
 # Lock for the number of images enhanced variable
 num_images_enhanced_lock = threading.Lock()
 
 # ImageEnhancer thread class. Responsible for performing the image enhancing operations.
-
-
 class ImageEnhancer (threading.Thread):
     def __init__(self, threadID):
         threading.Thread.__init__(self)
@@ -69,8 +74,7 @@ class ImageEnhancer (threading.Thread):
 
             # Get current time in seconds (for printing)
             curr_time = time.perf_counter()
-            print(
-                f"[{curr_time - start_time}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
+            print(f"[{curr_time - start_time}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
 
             # If specific output folder path does not yet exist, create the folder
             if not os.path.exists(output):
@@ -110,8 +114,6 @@ class ImageEnhancer (threading.Thread):
         print(f"Thread {self.ID} is exiting...")
 
 # Gets all filenames of the images to be enhanced from the specified folder path
-
-
 def get_images(path):
     # Global image queue
     global images, num_images_input
@@ -128,11 +130,7 @@ def get_images(path):
     num_images_input = images.qsize()
 
 # Enhances an image based on the brightness, sharpness, and contrast factors
-
-
 def enhance_image(image_data):
-    # print(f'Enhancing {image_data[1]}.{image_data[2]}')
-
     # Global image enhancement factors
     global brightness, sharpness, contrast
 
@@ -151,8 +149,7 @@ def enhance_image(image_data):
 
             # Enhance current frame based on enhancement factors using Pillow
             if (brightness != 1.0):
-                enhanced = ImageEnhance.Brightness(
-                    enhanced).enhance(brightness)
+                enhanced = ImageEnhance.Brightness(enhanced).enhance(brightness)
 
             if (sharpness != 1.0):
                 enhanced = ImageEnhance.Sharpness(enhanced).enhance(sharpness)
@@ -166,6 +163,9 @@ def enhance_image(image_data):
         # Append list of enhanced gif frames to image data
         image_data.append(enhanced_frames)
     else:
+        # Initialize enhanced image
+        enhanced = image
+
         # Enhance image based on enhancement factors using Pillow
         if (brightness != 1.0):
             enhanced = ImageEnhance.Brightness(image).enhance(brightness)
@@ -182,8 +182,6 @@ def enhance_image(image_data):
     return image_data
 
 # Main function
-
-
 def main(args):
     # Update system variables
     global time_limit, num_threads, brightness, sharpness, contrast, output
@@ -231,19 +229,17 @@ def main(args):
     # Create the statistics text file
     print(f"Creating statistics file...")
     file = open("stats.txt", "w")
-    file.write(f"Time elapsed: {finish_time - start_time} seconds")
-    file.write(f"Brightness enhancement factor: {brightness}")
-    file.write(f"Sharpness enhancement factor: {sharpness}")
-    file.write(f"Contrast enhancement factor: {contrast}")
-    file.write(f"Number of image enhancement threads used: {num_threads}")
+    file.write(f"Time elapsed: {finish_time - start_time} seconds\n")
+    file.write(f"Brightness enhancement factor: {brightness}\n")
+    file.write(f"Sharpness enhancement factor: {sharpness}\n")
+    file.write(f"Contrast enhancement factor: {contrast}\n")
+    file.write(f"Number of image enhancement threads used: {num_threads}\n")
     file.write(f"No. of input images: {num_images_input}\n")
     file.write(f"No. of enhanced images: {num_images_enhanced}\n\n")
     file.write(f"Enhanced images can be found in the {output} folder")
     print(f"Statistics file created!")
 
 # Class for defining float range used in argparse
-
-
 class Range(object):
     def __init__(self, start, end):
         self.start = start
