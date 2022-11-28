@@ -1,1 +1,4 @@
-No. of input images: 4041No. of enhanced images: 1992Enhanced images can be found in the Results folder
+Time elapsed: 60.19555479998235 secondsBrightness enhancement factor: 1.5Sharpness enhancement factor: 3.0Contrast enhancement factor: 0.5Number of image enhancement threads used: 100No. of input images: 5978
+No. of enhanced images: 3567
+
+Enhanced images can be found in the Results folder
