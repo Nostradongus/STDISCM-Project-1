@@ -1,0 +1,32 @@
+(1) Instead of incrementing shared variable "num_enhanced_images" in each thread iteration, 
+    it is accessed and incremented before the thread stops instead. More evident in higher 
+    thread numbers.
+
+        configruation:
+        images = 2041
+        brightness = 1.5
+        optimization #2 not applied
+
+        #  --> per iteration              | at end of thread
+        1  --> 45.6919329 seconds         | 44.5509184 seconds
+        2  --> 26.187068800000002 seconds | 26.1982791 seconds
+        4  --> 17.897292699999998 seconds | 16.6591039 seconds
+        8  --> 14.467433 seconds          | 14.1646094 seconds
+        16 --> 15.681509 seconds          | 15.0803216 seconds
+
+(2) Running all the enhancement functions (i.e., brightness, sharpness, contrast) all the 
+    time even if some of the factor values are equal to 1.0 results to some performance overhead.
+    With this, a condition was added to check if the factor value is equal to 1.0 or not. If not 
+    equal, apply the enhancement function. If equal, skip that enhancement function. 
+
+        configuration:
+        images = 2041
+        brightness = 1.5
+        optimization #1 not applied
+
+        #  --> apply all	              | apply needed only
+        1  --> 44.762386 seconds  	      | 28.31951 seconds
+        2  --> 27.069367800000002 seconds | 18.449087300000002 seconds
+        4  --> 15.9192436 seconds         | 13.8361988 seconds
+        8  --> 14.2061368 seconds         | 12.2915169 seconds
+        16 --> 14.0922853 seconds         | 12.158350800000001 seconds
