@@ -1,4 +1,54 @@
-Time elapsed: 60.19555479998235 secondsBrightness enhancement factor: 1.5Sharpness enhancement factor: 3.0Contrast enhancement factor: 0.5Number of image enhancement threads used: 100No. of input images: 5978
-No. of enhanced images: 3567
-
+Time elapsed: 60.58 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 11
+No. of input images: 5978
+No. of enhanced images: 5575
 Enhanced images can be found in the Results folder
+
+Time elapsed: 84.39 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 512
+No. of input images: 5978
+No. of enhanced images: 5662
+Enhanced images can be found in the Results folder
+
+Time elapsed: 5.39 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 512
+No. of input images: 5978
+No. of enhanced images: 0
+Enhanced images can be found in the Results folder
+
+Time elapsed: 63.64 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 512
+No. of input images: 5978
+No. of enhanced images: 3970
+Enhanced images can be found in the Results folder
+
+Time elapsed: 61.67 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 512
+No. of input images: 5978
+No. of enhanced images: 4850
+Enhanced images can be found in the Results folder
+
+Time elapsed: 65.95 seconds
+Brightness enhancement factor: 2.0
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement threads used: 1024
+No. of input images: 5978
+No. of enhanced images: 5478
+Enhanced images can be found in the Results folder
+

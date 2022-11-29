@@ -13,7 +13,7 @@ https://www.kaggle.com/datasets/balabaskar/tom-and-jerry-image-classification
 GIF Source:
 https://www.kaggle.com/datasets/raingo/tumblr-gif-description-dataset
 
-Last Updated: 11/28/22
+Last Updated: 11/29/22
 """
 
 # Image enhancement libraries
@@ -34,7 +34,7 @@ brightness = 1.0                  # Brightness enhancement factor
 sharpness = 1.0                   # Sharpness enhancement factor
 contrast = 1.0                    # Contrast enhancement factor
 output = "Results"                # Output folder name
-formats = ['jpg', 'png', 'gif']   # accepted image types / formats
+formats = ['jpg', 'png', 'gif']   # Accepted image types / formats
 start_time = time.perf_counter()  # Starting time of the program
 num_images_input = 0              # Number of input images
 
@@ -48,6 +48,19 @@ num_images_enhanced = 0
 # Lock for the number of images enhanced variable
 num_images_enhanced_lock = threading.Lock()
 
+# Gets the current time (in seconds) of the program
+def get_curr_time():
+    # Round off to two decimal places with trailing zeroes if needed
+    return '{:.2f}'.format(round(time.perf_counter() - start_time, 2))
+
+# Checks if time limit has been exceeded already
+def check_time_exceeded(curr_time):
+    # Global time system variables
+    global start_time, time_limit
+    
+    # Convert time_limit to seconds
+    return (curr_time - start_time) > (time_limit * 60.0) 
+
 # ImageEnhancer thread class. Responsible for performing the image enhancing operations.
 class ImageEnhancer (threading.Thread):
     def __init__(self, threadID):
@@ -59,26 +72,24 @@ class ImageEnhancer (threading.Thread):
         global images, num_images_enhanced, num_images_enhanced_lock, time_limit, output, start_time
         print(f"Thread {self.ID} is starting...")
 
-        while (images.empty() is not True):
-            # Get current time in seconds for checking if the time limit has been exceeded already.
-            curr_time = time.perf_counter()
-            # If time exceeded, break the loop
-            if (curr_time - start_time > (time_limit * 60.0)):  # Convert time_limit to seconds
+        while images.empty() is not True:
+            # If time limit exceeded, break the loop
+            if check_time_exceeded(time.perf_counter()):
                 break
 
             # Get the data of an image from the queue
-            curr_image_data = images.get()
+            # Stop operation after 2 seconds since it is possible that there are no more images in the queue
+            curr_image_data = images.get(timeout = 2) 
 
             # Enhance the image
             enhanced_image_data = enhance_image(curr_image_data)
+            
+            # If time limit exceeded after image enhancement, break the loop
+            if check_time_exceeded(time.perf_counter()):
+                break
 
             # Get current time in seconds (for printing)
-            curr_time = time.perf_counter()
-            print(f"[{curr_time - start_time}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
-
-            # If specific output folder path does not yet exist, create the folder
-            if not os.path.exists(output):
-                os.makedirs(output)
+            print(f"[{get_curr_time()}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
 
             # Save the enhanced image to the output folder
             # If current image is a gif
@@ -94,13 +105,11 @@ class ImageEnhancer (threading.Thread):
                 )
             else:
                 # save image (jpg or png)
-                enhanced_image_data[3].save(
-                    f'{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}')
+                enhanced_image_data[3].save(f'{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}')
 
             # Get current time in seconds (for printing)
-            curr_time = time.perf_counter()
             print(
-                f'[{curr_time - start_time}] - [Thread {self.ID}] Saved image at "{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}"'
+                f'[{get_curr_time()}] - [Thread {self.ID}] Saved image at "{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}"'
             )
 
             # Increment images enhanced counter of object
@@ -139,36 +148,45 @@ def enhance_image(image_data):
 
     # Check if image is a gif
     if image_data[2].lower() == 'gif':
+        # Initialize enhanced image
+        enhanced = image
+        
         # List of enhanced frames
         enhanced_frames = []
 
         # Enhance each frame of the gif
         for frame in ImageSequence.Iterator(image):
-            # Convert current frame to RGBA channel format
-            enhanced = frame.convert('RGBA')
+            # If time has already been exceeded, stop operation
+            if check_time_exceeded(time.perf_counter()):
+                return
+            
+            # Initialize enhanced frame by converting current frame's channel format to RGBA
+            enhanced_frame = frame.convert('RGBA')
 
             # Enhance current frame based on enhancement factors using Pillow
             if (brightness != 1.0):
-                enhanced = ImageEnhance.Brightness(enhanced).enhance(brightness)
+                # Modify brightness of image
+                enhanced = ImageEnhance.Brightness(enhanced_frame).enhance(brightness)
 
             if (sharpness != 1.0):
-                enhanced = ImageEnhance.Sharpness(enhanced).enhance(sharpness)
+                # Modify sharpness of image
+                enhanced = ImageEnhance.Sharpness(enhanced_frame).enhance(sharpness)
 
             if (contrast != 1.0):
-                enhanced = ImageEnhance.Contrast(enhanced).enhance(contrast)
+                # Modify contrast of image
+                enhanced = ImageEnhance.Contrast(enhanced_frame).enhance(contrast)
 
             # Store enhanced current frame
-            enhanced_frames.append(enhanced)
+            enhanced_frames.append(enhanced_frame)
 
         # Append list of enhanced gif frames to image data
         image_data.append(enhanced_frames)
     else:
         # Initialize enhanced image
         enhanced = image
-
-        # Enhance image based on enhancement factors using Pillow
+        
         if (brightness != 1.0):
-            enhanced = ImageEnhance.Brightness(image).enhance(brightness)
+            enhanced = ImageEnhance.Brightness(enhanced).enhance(brightness)
 
         if (sharpness != 1.0):
             enhanced = ImageEnhance.Sharpness(enhanced).enhance(sharpness)
@@ -192,11 +210,12 @@ def main(args):
     contrast = fabs(args.contrast)
     output = args.output
 
-    # Global enhanced images list
-    global enhanced_images
-
     # Get all images from specified folder
     get_images(args.images)
+
+    # If output folder in the given path does not yet exist, create the folder
+    if not os.path.exists(output):
+        os.makedirs(output)
 
     # Create threads
     threads = []
@@ -216,8 +235,7 @@ def main(args):
     global start_time
 
     # Display statistics in the console
-    finish_time = time.perf_counter()
-    print(f"\nTime elapsed: {finish_time - start_time} seconds")
+    print(f"\nTime elapsed: {get_curr_time()} seconds")
     print(f"Brightness enhancement factor: {brightness}")
     print(f"Sharpness enhancement factor: {sharpness}")
     print(f"Contrast enhancement factor: {contrast}")
@@ -228,18 +246,18 @@ def main(args):
 
     # Create the statistics text file
     print(f"Creating statistics file...")
-    file = open("stats.txt", "w")
-    file.write(f"Time elapsed: {finish_time - start_time} seconds\n")
+    file = open("stats.txt", "a")
+    file.write(f"Time elapsed: {get_curr_time()} seconds\n")
     file.write(f"Brightness enhancement factor: {brightness}\n")
     file.write(f"Sharpness enhancement factor: {sharpness}\n")
     file.write(f"Contrast enhancement factor: {contrast}\n")
     file.write(f"Number of image enhancement threads used: {num_threads}\n")
     file.write(f"No. of input images: {num_images_input}\n")
-    file.write(f"No. of enhanced images: {num_images_enhanced}\n\n")
-    file.write(f"Enhanced images can be found in the {output} folder")
+    file.write(f"No. of enhanced images: {num_images_enhanced}\n")
+    file.write(f"Enhanced images can be found in the {output} folder\n\n")
     print(f"Statistics file created!")
 
-# Class for defining float range used in argparse
+# Class for defining float range to be used in argparse
 class Range(object):
     def __init__(self, start, end):
         self.start = start
