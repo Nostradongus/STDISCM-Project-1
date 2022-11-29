@@ -1,4 +1,4 @@
-# STDISCM Parallel Programming Project: Image Enhancer
+# STDISCM Parallel Programming Project: Bulk Image Enhancer
 
 ### Group 2
 
