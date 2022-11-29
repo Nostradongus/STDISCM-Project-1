@@ -37,18 +37,18 @@ formats = ['jpg', 'png', 'gif'] # Accepted image types / formats
 class ImageEnhancer(multiprocessing.Process):
     # Constructor 
     def __init__(self, processID, brightness, sharpness, contrast,
-                 output, images, num_images_enhanced, num_images_enhanced_lock, 
+                 output, images, num_enhanced_global, num_enhanced_global_lock, 
                  time_limit, start_time):
         multiprocessing.Process.__init__(self)
         self.ID = processID
-        self.enhanced_images = 0
+        self.num_enhanced = 0
         self.brightness = brightness
         self.sharpness = sharpness
         self.contrast = contrast
         self.output = output
         self.images = images
-        self.num_images_enhanced = num_images_enhanced
-        self.num_images_enhanced_lock = num_images_enhanced_lock
+        self.num_enhanced_global = num_enhanced_global
+        self.num_enhanced_global_lock = num_enhanced_global_lock
         self.time_limit = time_limit
         self.start_time = start_time
         
@@ -102,13 +102,13 @@ class ImageEnhancer(multiprocessing.Process):
             )
             
             # Increment images enhanced counter of object
-            self.enhanced_images += 1
+            self.num_enhanced += 1
             
         # Add the total of enhanced images of this object to the shared total
         # Ensure mutual exclusion first
-        self.num_images_enhanced_lock.acquire()
-        self.num_images_enhanced.value += self.enhanced_images
-        self.num_images_enhanced_lock.release()
+        self.num_enhanced_global_lock.acquire()
+        self.num_enhanced_global.value += self.num_enhanced
+        self.num_enhanced_global_lock.release()
         
         print(f"Process {self.ID} is exiting...")
 
@@ -207,8 +207,8 @@ def main(args):
     
     # Initialize multiprocessing variables
     manager = multiprocessing.Manager() # For creating process-shared variables
-    num_images_enhanced = manager.Value('num_images_enhanced', 0) # Number of images enhanced
-    num_images_enhanced_lock = multiprocessing.Lock() # For updating the shared num_images_enhanced variable
+    num_enhanced_global = manager.Value('num_enhanced_global', 0) # Number of images enhanced
+    num_enhanced_global_lock = multiprocessing.Lock() # For updating the shared num_enhanced_global variable
     images = multiprocessing.Queue() # Images queue
     
     # Get all images from specified folder
@@ -225,8 +225,8 @@ def main(args):
     processes = []
     for i in range(num_processes):
         process = ImageEnhancer(i+1, brightness, sharpness, contrast,
-                                output, images, num_images_enhanced, 
-                                num_images_enhanced_lock, time_limit, 
+                                output, images, num_enhanced_global, 
+                                num_enhanced_global_lock, time_limit, 
                                 start_time)
         processes.append(process)
         process.start()
@@ -248,7 +248,7 @@ def main(args):
     print(f"Contrast enhancement factor: {contrast}")
     print(f"Number of image enhancement processes used: {num_processes}")
     print(f"No. of input images: {num_images_input}")
-    print(f"No. of enhanced images: {num_images_enhanced.value}\n")
+    print(f"No. of enhanced images: {num_enhanced_global.value}\n")
     print(f"Enhanced images can be found in the {output} folder\n")
 
     # Create the statistics text file
@@ -261,7 +261,7 @@ def main(args):
     file.write(f"Contrast enhancement factor: {contrast}\n")
     file.write(f"Number of image enhancement processes used: {num_processes}\n")
     file.write(f"No. of input images: {num_images_input}\n")
-    file.write(f"No. of enhanced images: {num_images_enhanced.value}\n")
+    file.write(f"No. of enhanced images: {num_enhanced_global.value}\n")
     file.write(f"Enhanced images can be found in the {output} folder\n\n")
     print(f"Statistics file created!")
     
