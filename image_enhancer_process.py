@@ -148,21 +148,21 @@ def enhance_image(image_data, brightness, sharpness, contrast,
             # Enhance current frame based on enhancement factors using Pillow
             if (brightness != 1.0):
                 # Modify brightness of image
-                enhanced = ImageEnhance.Brightness(
+                enhanced_frame = ImageEnhance.Brightness(
                     enhanced_frame).enhance(brightness)
 
             if (sharpness != 1.0):
                 # Modify sharpness of image
-                enhanced = ImageEnhance.Sharpness(
+                enhanced_frame = ImageEnhance.Sharpness(
                     enhanced_frame).enhance(sharpness)
 
             if (contrast != 1.0):
                 # Modify contrast of image
-                enhanced = ImageEnhance.Contrast(
+                enhanced_frame = ImageEnhance.Contrast(
                     enhanced_frame).enhance(contrast)
 
             # Store enhanced current frame
-            enhanced_frames.append(enhanced)
+            enhanced_frames.append(enhanced_frame)
 
         # Append list of enhanced gif frames to image data
         image_data.append(enhanced_frames)

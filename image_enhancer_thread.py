@@ -46,11 +46,11 @@ num_images_input = 0              # Number of input images
 # Images queue (each element is a list [input path, image filename, image format / type (extension)])
 images = queue.Queue()
 # Number of images enhanced by the threads
-num_images_enhanced = 0
+num_enhanced_global = 0
 
 # Synchronization variables
 # Lock for the number of images enhanced variable
-num_images_enhanced_lock = threading.Lock()
+num_enhanced_global_lock = threading.Lock()
 
 # ImageEnhancer thread class. Responsible for performing the image enhancing operations.
 class ImageEnhancer(threading.Thread):
@@ -58,11 +58,11 @@ class ImageEnhancer(threading.Thread):
     def __init__(self, threadID):
         threading.Thread.__init__(self)
         self.ID = threadID
-        self.enhanced_images = 0
+        self.num_enhanced = 0
 
     # Instructions that the ImageEnhancer thread will do once it runs
     def run(self):
-        global images, num_images_enhanced, num_images_enhanced_lock, time_limit, output, start_time
+        global images, num_enhanced_global, num_enhanced_global_lock, time_limit, start_time, output
         print(f"Thread {self.ID} is starting...")
 
         # Repeat until no more images to be enhanced
@@ -110,13 +110,12 @@ class ImageEnhancer(threading.Thread):
             )
 
             # Increment images enhanced counter of object
-            self.enhanced_images += 1
+            self.num_enhanced += 1
 
         # Add the total of enhanced images of this object to the global total
-        # Ensure mutual exclusion first
-        num_images_enhanced_lock.acquire()
-        num_images_enhanced += self.enhanced_images
-        num_images_enhanced_lock.release()
+        num_enhanced_global_lock.acquire()
+        num_enhanced_global += self.num_enhanced
+        num_enhanced_global_lock.release()
 
         print(f"Thread {self.ID} is exiting...")
         
@@ -150,7 +149,7 @@ def enhance_image(image_data):
         enhanced_frames = []
 
         # Enhance each frame of the gif
-        for frame in ImageSequence.Iterator(image):
+        for frame in ImageSequence.Iterator(enhanced):
             # If time has already been exceeded, stop operation
             if check_time_exceeded(time.perf_counter()):
                 return
@@ -161,18 +160,20 @@ def enhance_image(image_data):
             # Enhance current frame based on enhancement factors using Pillow
             if (brightness != 1.0):
                 # Modify brightness of image
-                enhanced = ImageEnhance.Brightness(enhanced_frame).enhance(brightness)
+                enhanced_frame = ImageEnhance.Brightness(enhanced_frame).enhance(brightness)
 
             if (sharpness != 1.0):
                 # Modify sharpness of image
-                enhanced = ImageEnhance.Sharpness(enhanced_frame).enhance(sharpness)
+                enhanced_frame = ImageEnhance.Sharpness(
+                    enhanced_frame).enhance(sharpness)
 
             if (contrast != 1.0):
                 # Modify contrast of image
-                enhanced = ImageEnhance.Contrast(enhanced_frame).enhance(contrast)
+                enhanced_frame = ImageEnhance.Contrast(
+                    enhanced_frame).enhance(contrast)
 
             # Store enhanced current frame
-            enhanced_frames.append(enhanced)
+            enhanced_frames.append(enhanced_frame)
 
         # Append list of enhanced gif frames to image data
         image_data.append(enhanced_frames)
@@ -240,7 +241,7 @@ def main(args):
         thread.join()
 
     # Global number of images and number of enhanced images variables
-    global num_images_input, num_images_enhanced
+    global num_images_input, num_enhanced_global
 
     # Global start time variable
     global start_time
@@ -253,7 +254,7 @@ def main(args):
     print(f"Contrast enhancement factor: {contrast}")
     print(f"Number of image enhancement threads used: {num_threads}")
     print(f"No. of input images: {num_images_input}")
-    print(f"No. of enhanced images: {num_images_enhanced}\n")
+    print(f"No. of enhanced images: {num_enhanced_global}\n")
     print(f"Enhanced images can be found in the {output} folder\n")
 
     # Create the statistics text file
@@ -266,7 +267,7 @@ def main(args):
     file.write(f"Contrast enhancement factor: {contrast}\n")
     file.write(f"Number of image enhancement threads used: {num_threads}\n")
     file.write(f"No. of input images: {num_images_input}\n")
-    file.write(f"No. of enhanced images: {num_images_enhanced}\n")
+    file.write(f"No. of enhanced images: {num_enhanced_global}\n")
     file.write(f"Enhanced images can be found in the {output} folder\n\n")
     print(f"Statistics file created!")
     
