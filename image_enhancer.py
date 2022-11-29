@@ -42,8 +42,6 @@ num_images_enhanced = 0  # Number of images enhanced by the threads
 num_images_enhanced_lock = threading.Lock()
 
 # ImageEnhancer thread class. Responsible for performing the image enhancing operations.
-
-
 class ImageEnhancer (threading.Thread):
     def __init__(self, threadID):
         threading.Thread.__init__(self)
@@ -110,8 +108,6 @@ class ImageEnhancer (threading.Thread):
         print(f"Thread {self.ID} is exiting...")
 
 # Gets all filenames of the images to be enhanced from the specified folder path
-
-
 def get_images(path):
     # Global image queue
     global images, num_images_input
@@ -128,8 +124,6 @@ def get_images(path):
     num_images_input = images.qsize()
 
 # Enhances an image based on the brightness, sharpness, and contrast factors
-
-
 def enhance_image(image_data):
     # print(f'Enhancing {image_data[1]}.{image_data[2]}')
 
@@ -182,8 +176,6 @@ def enhance_image(image_data):
     return image_data
 
 # Main function
-
-
 def main(args):
     # Update system variables
     global time_limit, num_threads, brightness, sharpness, contrast, output
@@ -242,8 +234,6 @@ def main(args):
     print(f"Statistics file created!")
 
 # Class for defining float range used in argparse
-
-
 class Range(object):
     def __init__(self, start, end):
         self.start = start
