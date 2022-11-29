@@ -7,59 +7,56 @@ Group 2
 - Andre Dominic Ponce
 - Joshue Salvador Jadie 
 
-Tom & Jerry Images Source:
-https://www.kaggle.com/datasets/balabaskar/tom-and-jerry-image-classification
-
-GIF Source:
-https://www.kaggle.com/datasets/raingo/tumblr-gif-description-dataset
-
 Last Updated: 11/28/22
 """
 
 # Image enhancement libraries
-import os               # For accessing directories (folders, etc.)
-from math import fabs   # For absolute float value conversion
-import argparse         # For parsing command line arguments
+import os        # For accessing directories (folders, etc.)
+from math import fabs  # For absolute float value conversion
+import argparse  # For parsing command line arguments
 from PIL import Image, ImageSequence, ImageEnhance  # For enhancing images
 
 # Thread synchronization libraries
-import threading  # For creating threads
+import multiprocessing  # For creating threads
 import queue      # For thread-safe queue object
 import time       # For time checking, etc.
 
 # System variables
-time_limit = 1                    # Enhancing time limit (in minutes)
-num_threads = 5                   # Number of threads that will enhance the images
-brightness = 1.0                  # Brightness enhancement factor
-sharpness = 1.0                   # Sharpness enhancement factor
-contrast = 1.0                    # Contrast enhancement factor
-output = "Results"                # Output folder name
-formats = ['jpg', 'png', 'gif']   # accepted image types / formats
-start_time = time.perf_counter()  # Starting time of the program
-num_images_input = 0              # Number of input images
+time_limit = 1                   # Enhancing time limit (in minutes)
+num_processes = 5                  # Number of threads that will enhance the images
+brightness = 1.0                 # Brightness enhancement factor
+sharpness = 1.0                  # Sharpness enhancement factor
+contrast = 1.0                   # Contrast enhancement factor
+output = "Results"               # Output folder name
+start_time = time.perf_counter() # Starting time of the program
+num_images_input = 0             # Number of input images
+formats = ['jpg', 'png', 'gif']  # accepted image types / formats
 
 # Global shared variables
 # Images queue (each element is a list [input path, image filename, image format / type (extension)])
-images = queue.Queue()
-# Number of images enhanced by the threads
-num_images_enhanced = 0
+images = multiprocessing.Queue()
+# num_images_enhanced  # Number of images enhanced by the threads
 
 # Synchronization variables
 # Lock for the number of images enhanced variable
-num_images_enhanced_lock = threading.Lock()
+num_images_enhanced_lock = multiprocessing.Lock()
 
 # ImageEnhancer thread class. Responsible for performing the image enhancing operations.
-class ImageEnhancer (threading.Thread):
-    def __init__(self, threadID):
-        threading.Thread.__init__(self)
+class ImageEnhancer (multiprocessing.Process):
+    def __init__(self, threadID, num_images_enhanced, images):
+        multiprocessing.Process.__init__(self)
         self.ID = threadID
         self.enhanced_images = 0
+        self.num_images_enhanced = num_images_enhanced
+        self.images = images
 
     def run(self):
-        global images, num_images_enhanced, num_images_enhanced_lock, time_limit, output, start_time
+        global num_images_enhanced_lock, time_limit, output, start_time
         print(f"Thread {self.ID} is starting...")
 
-        while (images.empty() is not True):
+        print(f"Ayo? {self.images.empty()}")
+
+        while (self.images.empty() is not True):
             # Get current time in seconds for checking if the time limit has been exceeded already.
             curr_time = time.perf_counter()
             # If time exceeded, break the loop
@@ -67,14 +64,15 @@ class ImageEnhancer (threading.Thread):
                 break
 
             # Get the data of an image from the queue
-            curr_image_data = images.get()
+            curr_image_data = self.images.get()
 
             # Enhance the image
             enhanced_image_data = enhance_image(curr_image_data)
 
             # Get current time in seconds (for printing)
             curr_time = time.perf_counter()
-            print(f"[{curr_time - start_time}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
+            print(
+                f"[{curr_time - start_time}] - [Process {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
 
             # If specific output folder path does not yet exist, create the folder
             if not os.path.exists(output):
@@ -100,7 +98,7 @@ class ImageEnhancer (threading.Thread):
             # Get current time in seconds (for printing)
             curr_time = time.perf_counter()
             print(
-                f'[{curr_time - start_time}] - [Thread {self.ID}] Saved image at "{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}"'
+                f'[{curr_time - start_time}] - [Process {self.ID}] Saved image at "{output}/{enhanced_image_data[1]}.{enhanced_image_data[2]}"'
             )
 
             # Increment images enhanced counter of object
@@ -108,12 +106,14 @@ class ImageEnhancer (threading.Thread):
 
         # Add the total of enhanced images of this object to the global total
         num_images_enhanced_lock.acquire()
-        num_images_enhanced += self.enhanced_images
+        self.num_images_enhanced.value += self.enhanced_images
         num_images_enhanced_lock.release()
 
-        print(f"Thread {self.ID} is exiting...")
+        print(f"Process {self.ID} is exiting...")
 
 # Gets all filenames of the images to be enhanced from the specified folder path
+
+
 def get_images(path):
     # Global image queue
     global images, num_images_input
@@ -131,6 +131,8 @@ def get_images(path):
 
 # Enhances an image based on the brightness, sharpness, and contrast factors
 def enhance_image(image_data):
+    # print(f'Enhancing {image_data[1]}.{image_data[2]}')
+
     # Global image enhancement factors
     global brightness, sharpness, contrast
 
@@ -163,9 +165,8 @@ def enhance_image(image_data):
         # Append list of enhanced gif frames to image data
         image_data.append(enhanced_frames)
     else:
-        # Initialize enhanced image
         enhanced = image
-
+        
         # Enhance image based on enhancement factors using Pillow
         if (brightness != 1.0):
             enhanced = ImageEnhance.Brightness(image).enhance(brightness)
@@ -184,33 +185,37 @@ def enhance_image(image_data):
 # Main function
 def main(args):
     # Update system variables
-    global time_limit, num_threads, brightness, sharpness, contrast, output
+    global time_limit, num_processes, brightness, sharpness, contrast, output
     time_limit = fabs(args.time)
-    num_threads = abs(args.threads)
+    num_processes = abs(args.threads)
     brightness = fabs(args.brightness)
     sharpness = fabs(args.sharpness)
     contrast = fabs(args.contrast)
     output = args.output
 
     # Global enhanced images list
-    global enhanced_images
+    # global enhanced_images
 
     # Get all images from specified folder
     get_images(args.images)
 
+    manager = multiprocessing.Manager()
+    num_images_enhanced = manager.Value('num_images_enhanced', 0)
+
+    global images
     # Create threads
-    threads = []
-    for i in range(num_threads):
-        thread = ImageEnhancer(i)
-        threads.append(thread)
-        thread.start()
+    processes = []
+    for i in range(num_processes):
+        process = ImageEnhancer(i, num_images_enhanced, images)
+        processes.append(process)
+        process.start()
 
     # Join threads
-    for thread in threads:
-        thread.join()
+    for process in processes:
+        process.join()
 
     # Global number of images and number of enhanced images variables
-    global num_images_input, num_images_enhanced
+    global num_images_input
 
     # Global start time variable
     global start_time
@@ -221,21 +226,21 @@ def main(args):
     print(f"Brightness enhancement factor: {brightness}")
     print(f"Sharpness enhancement factor: {sharpness}")
     print(f"Contrast enhancement factor: {contrast}")
-    print(f"Number of image enhancement threads used: {num_threads}")
+    print(f"Number of image enhancement threads used: {num_processes}")
     print(f"No. of input images: {num_images_input}")
-    print(f"No. of enhanced images: {num_images_enhanced}\n")
+    print(f"No. of enhanced images: {num_images_enhanced.value}\n")
     print(f"Enhanced images can be found in the {output} folder\n")
 
     # Create the statistics text file
     print(f"Creating statistics file...")
     file = open("stats.txt", "w")
-    file.write(f"Time elapsed: {finish_time - start_time} seconds\n")
-    file.write(f"Brightness enhancement factor: {brightness}\n")
-    file.write(f"Sharpness enhancement factor: {sharpness}\n")
-    file.write(f"Contrast enhancement factor: {contrast}\n")
-    file.write(f"Number of image enhancement threads used: {num_threads}\n")
+    file.write(f"Time elapsed: {finish_time - start_time} seconds")
+    file.write(f"Brightness enhancement factor: {brightness}")
+    file.write(f"Sharpness enhancement factor: {sharpness}")
+    file.write(f"Contrast enhancement factor: {contrast}")
+    file.write(f"Number of image enhancement threads used: {num_processes}")
     file.write(f"No. of input images: {num_images_input}\n")
-    file.write(f"No. of enhanced images: {num_images_enhanced}\n\n")
+    file.write(f"No. of enhanced images: {num_images_enhanced.value}\n\n")
     file.write(f"Enhanced images can be found in the {output} folder")
     print(f"Statistics file created!")
 
