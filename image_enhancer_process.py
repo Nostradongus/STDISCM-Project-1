@@ -253,7 +253,7 @@ def main(args):
 
     # Create the statistics text file
     print(f"Creating statistics file...")
-    file = open("stats-2.txt", "a")
+    file = open("stats-process.txt", "a")
     file.write(f"[TEST # {str(uuid.uuid4())}]\n")
     file.write(f"Time elapsed: {finish_time} seconds\n")
     file.write(f"Brightness enhancement factor: {brightness}\n")
