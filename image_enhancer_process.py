@@ -70,12 +70,7 @@ class ImageEnhancer(multiprocessing.Process):
                 break
             
             # Enhance the image
-            enhanced_image_data = enhance_image(
-                curr_image_data, self.brightness, self.sharpness, self.contrast, self.start_time, self.time_limit)
-            
-            # If time limit exceeded after image enhancement, stop operation
-            if check_time_exceeded(self.start_time, self.time_limit, time.perf_counter()):
-                break
+            enhanced_image_data = enhance_image(curr_image_data, self.brightness, self.sharpness, self.contrast, self.start_time, self.time_limit)
             
             # Get current time in seconds after image enhancement (for printing)
             print(f"[{get_curr_time(self.start_time)}] - [Process {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
@@ -138,10 +133,6 @@ def enhance_image(image_data, brightness, sharpness, contrast,
 
         # Enhance each frame of the gif
         for frame in ImageSequence.Iterator(enhanced):
-            # If time has already been exceeded, stop operation
-            if check_time_exceeded(start_time, time_limit, time.perf_counter()):
-                return
-
             # Initialize enhanced frame by converting current frame's channel format to RGBA
             enhanced_frame = frame.convert('RGBA')
 

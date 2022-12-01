@@ -80,10 +80,6 @@ class ImageEnhancer(threading.Thread):
 
             # Enhance the image
             enhanced_image_data = enhance_image(curr_image_data)
-            
-            # If time limit exceeded after image enhancement, stop operation
-            if check_time_exceeded(time.perf_counter()):
-                break
 
             # Get current time in seconds after image enhancement (for printing)
             print(f"[{get_curr_time()}] - [Thread {self.ID}] Enhancing {curr_image_data[1]}.{curr_image_data[2]}")
@@ -150,10 +146,6 @@ def enhance_image(image_data):
 
         # Enhance each frame of the gif
         for frame in ImageSequence.Iterator(enhanced):
-            # If time has already been exceeded, stop operation
-            if check_time_exceeded(time.perf_counter()):
-                return
-            
             # Initialize enhanced frame by converting current frame's channel format to RGBA
             enhanced_frame = frame.convert('RGBA')
 
