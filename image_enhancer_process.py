@@ -231,8 +231,13 @@ def main(args):
     while not images.empty():
         images.get()
         
-    # Display statistics in the console
+    # Get finish time of program
     finish_time = get_curr_time(start_time)
+    # Get unique ID for this run
+    UUID = str(uuid.uuid4())
+
+    # Display statistics in the console
+    print(f"[TEST ID: {UUID}]")
     print(f"\nTime elapsed: {finish_time} seconds")
     print(f"Brightness enhancement factor: {brightness}")
     print(f"Sharpness enhancement factor: {sharpness}")
@@ -245,7 +250,7 @@ def main(args):
     # Create the statistics text file
     print(f"Creating statistics file...")
     file = open("stats-process.txt", "a")
-    file.write(f"[TEST # {str(uuid.uuid4())}]\n")
+    file.write(f"[TEST ID: {UUID}]")
     file.write(f"\nTime elapsed: {finish_time} seconds\n")
     file.write(f"Brightness enhancement factor: {brightness}\n")
     file.write(f"Sharpness enhancement factor: {sharpness}\n")
