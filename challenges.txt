@@ -1,4 +1,6 @@
 STDISCM Parallel Programming Project: Image Enhancer
 
 Challenges:
-(1) ...
+(1) Bulk loading of image matrices at the beginning is causing a significant delay for the program's run time.
+(2) The coordination of global variables is a difficult task when using processes compared to threads.
+(3) ...
