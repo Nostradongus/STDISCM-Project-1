@@ -1,0 +1,110 @@
+[TEST ID: 805e4a2f-a6f1-4e03-8592-183c161d2b9c]
+Time elapsed: 61.57 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 1.0
+Contrast enhancement factor: 1.0
+Number of image enhancement processes used: 2
+No. of input images: 5978
+No. of enhanced images: 4432
+Enhanced images can be found in the Results folder
+
+[TEST ID: 1e1320b0-bf30-4f1e-b739-d9db226f4696]
+Time elapsed: 60.98 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 1.0
+Number of image enhancement processes used: 2
+No. of input images: 5978
+No. of enhanced images: 2685
+Enhanced images can be found in the Results folder
+
+[TEST ID: 1e406867-daed-4ab9-a3c9-18bddfc9e7c9]
+Time elapsed: 61.01 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 2
+No. of input images: 5978
+No. of enhanced images: 2175
+Enhanced images can be found in the Results folder
+
+[TEST ID: 26d7d9a7-2979-4a0c-b516-8c0aa3b5dd80]
+Time elapsed: 211.60 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 2
+No. of input images: 5978
+No. of enhanced images: 5784
+Enhanced images can be found in the Results folder
+
+[TEST ID: f713835d-6e8f-41b3-bef9-7b69b91169c0]
+Time elapsed: 60.89 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 1.0
+Number of image enhancement processes used: 4
+No. of input images: 5978
+No. of enhanced images: 4641
+Enhanced images can be found in the Results folder
+
+[TEST ID: 60fc6cd6-7b0a-4820-9acc-4db409bb0995]
+Time elapsed: 61.40 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 4
+No. of input images: 5978
+No. of enhanced images: 3952
+Enhanced images can be found in the Results folder
+
+[TEST ID: 5479fbbc-cca5-4c2d-8348-8586427b9481]
+Time elapsed: 161.75 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 4
+No. of input images: 5978
+No. of enhanced images: 5978
+Enhanced images can be found in the Results folder
+
+[TEST ID: 8b583c38-f8c8-4962-94af-3ef752031ced]
+Time elapsed: 61.00 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 8
+No. of input images: 5978
+No. of enhanced images: 5055
+Enhanced images can be found in the Results folder
+
+[TEST ID: a9336849-b759-4f50-96ec-46117c084171]
+Time elapsed: 130.16 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 8
+No. of input images: 5978
+No. of enhanced images: 5978
+Enhanced images can be found in the Results folder
+
+[TEST ID: c1aa34ea-4da7-4a48-9953-b84d7e3870b5]
+Time elapsed: 61.18 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 12
+No. of input images: 5978
+No. of enhanced images: 4699
+Enhanced images can be found in the Results folder
+
+[TEST ID: dacc6ab0-3a76-411a-b9ac-e310219c5603]
+Time elapsed: 130.90 seconds
+Brightness enhancement factor: 1.5
+Sharpness enhancement factor: 0.2
+Contrast enhancement factor: 0.1
+Number of image enhancement processes used: 12
+No. of input images: 5978
+No. of enhanced images: 5978
+Enhanced images can be found in the Results folder
+
