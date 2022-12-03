@@ -2,7 +2,7 @@
     it is accessed and incremented before the thread stops instead. More evident in higher 
     thread numbers.
 
-        configruation:
+        configuration:
         images = 2041
         brightness = 1.5
         optimization #2 not applied
